@@ -1,0 +1,91 @@
+Есть исходные тексты некоторого проекта на языке Си. Необходимо удалить из файлов все комментарии.
+
+Имена исходных файлов сохранены в файле project.txt. На первой строке файла указано целое число N - количество файлов проекта. Далее в файле следует N строк - имена исходных файлов на языке Си. Длина имени с расширением не превышает 32 символа. Все файлы имеют расширение ".c". Размер файла исходного кода не превышает 50 кб.
+
+Ваша программа должна считать каждый файл исходного кода, удалить из него комментарии, и сохранить результат в новый файл. Имя файла-результата совпадает с исходным, но имеет другое расширение - ".wc"
+
+Например, если исходный файл project.txt содержит строки:
+file1.c
+file2.c
+то результатом работы вашей программы должны быть файлы file1.wc и file2.wc
+
+Допускается как наличие в месте удаленного комментария нескольких новых пробелов и/или переводов строк так и отсутствие некоторых существующих.
+Не допускается удаление данных из константных строк, обозначенных кавычками (двойными и одинарными).
+Однострочный комментарий может быть записан в несколько строк: для этого может быть применен символ разреза/склейки строки \ (допустим только в конце строки и может быть только ее последним символом).
+Аналогичным образом могут быть разорваны и строковые константы.
+Примеры обработки файлов:
+Данные входного файла "input1.c":
+int myproc1()
+{
+   const char* nc = " Don't touch text /* inside */ quoted strings ";
+
+   // This is comment
+   printf(" This is // not comment ");
+   
+   printf(" This is /* not comment */ too");
+
+   myproc2();  // This is comment 
+
+   /* This is comment too */ myproc3();
+
+   myproc4();
+
+   /* This is
+      multiline comment */
+
+   myproc5();
+
+   // This is "cut-line"  \
+and prolongation of single-line comment
+
+   myproc6();
+
+   printf(  " This is multiline \
+string constant                 \
+without /* comment. Don't /*  \
+touch me. */ please" );
+
+   /* This is multiline comment
+      // this is single-line comment inside multiline */
+
+   myproc7();
+
+   /* This is multiline comment ...
+       /* prolongation ....
+       end of comment here -> */  
+
+   myproc8();
+
+   return 1;
+}
+
+Данные выходного файла "input1.wc":
+int myproc1()
+{
+   const char* nc = " Don't touch text /* inside */ quoted strings ";
+
+   printf(" This is // not comment ");
+   
+   printf(" This is /* not comment */ too");
+
+   myproc2();
+
+   myproc3();
+
+   myproc4();
+
+   myproc5();
+
+   myproc6();
+
+   printf(  " This is multiline \
+string constant                 \
+without /* comment. Don't /*  \
+touch me. */ please" );
+
+   myproc7();
+
+   myproc8();
+
+   return 1;
+}
