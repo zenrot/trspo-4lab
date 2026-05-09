@@ -31,29 +31,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Install sshpass
+      - name: Prepare SSH key
         run: |
           set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y sshpass
-
-      - name: Prepare SSH known hosts
-        env:
-          SSHPASS: ${{ secrets.DEPLOY_PASSWORD }}
-        run: |
-          set -euo pipefail
-          if [ -z "${SSHPASS:-}" ]; then
-            echo "::error::GitHub secret DEPLOY_PASSWORD is empty or missing. Add it in Settings -> Secrets and variables -> Actions."
+          if [ -z "${{ secrets.DEPLOY_SSH_KEY }}" ]; then
+            echo "::error::GitHub secret DEPLOY_SSH_KEY is empty or missing. Add the private SSH key in Settings -> Secrets and variables -> Actions."
             exit 1
           fi
           mkdir -p ~/.ssh
+          printf '%s\n' '${{ secrets.DEPLOY_SSH_KEY }}' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -T 10 -p 22 -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
-          sshpass -e ssh \
+          ssh-keygen -y -f ~/.ssh/id_ed25519 >/dev/null
+          ssh \
             -p 22 \
             -o StrictHostKeyChecking=yes \
-            -o PreferredAuthentications=password,keyboard-interactive \
-            -o PubkeyAuthentication=no \
-            -o NumberOfPasswordPrompts=1 \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -i ~/.ssh/id_ed25519 \
             -o ConnectTimeout=20 \
             "$DEPLOY_USER@$DEPLOY_HOST" 'echo SSH_OK'
 
@@ -71,30 +66,26 @@ jobs:
             -czf "/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz" .
 
       - name: Upload package
-        env:
-          SSHPASS: ${{ secrets.DEPLOY_PASSWORD }}
         run: |
           set -euo pipefail
-          sshpass -e scp \
+          scp \
             -P 22 \
             -o StrictHostKeyChecking=yes \
-            -o PreferredAuthentications=password,keyboard-interactive \
-            -o PubkeyAuthentication=no \
-            -o NumberOfPasswordPrompts=1 \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -i ~/.ssh/id_ed25519 \
             -o ConnectTimeout=20 \
             "/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz"
 
       - name: Deploy over SSH
-        env:
-          SSHPASS: ${{ secrets.DEPLOY_PASSWORD }}
         run: |
           set -euo pipefail
-          sshpass -e ssh \
+          ssh \
             -p 22 \
             -o StrictHostKeyChecking=yes \
-            -o PreferredAuthentications=password,keyboard-interactive \
-            -o PubkeyAuthentication=no \
-            -o NumberOfPasswordPrompts=1 \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -i ~/.ssh/id_ed25519 \
             -o ConnectTimeout=20 \
             "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' <<REMOTE
           set -euo pipefail
