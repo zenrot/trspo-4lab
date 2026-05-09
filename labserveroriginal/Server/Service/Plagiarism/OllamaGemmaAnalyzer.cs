@@ -34,7 +34,7 @@ public class OllamaGemmaAnalyzer : ILlmCodeSimilarityAnalyzer
         CancellationToken cancellationToken = default)
     {
         var baseUrl = _configuration.GetValue<System.String>("Plagiarism:Ollama:BaseUrl") ?? "http://localhost:11434";
-        var model = _configuration.GetValue<System.String>("Plagiarism:Ollama:Model") ?? "gemma2:2b";
+        var model = _configuration.GetValue<System.String>("Plagiarism:Ollama:Model") ?? "qwen2.5-coder:0.5b";
         var prompt = BuildPrompt(submissionCode, referenceCode, tokenSimilarity);
 
         try

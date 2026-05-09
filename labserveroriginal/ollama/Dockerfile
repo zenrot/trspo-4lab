@@ -1,6 +1,6 @@
 FROM ollama/ollama:latest
 
-ARG OLLAMA_MODEL=gemma2:2b
+ARG OLLAMA_MODEL=qwen2.5-coder:0.5b
 ENV OLLAMA_MODELS=/usr/share/ollama/.ollama/models
 
 RUN ollama serve >/tmp/ollama-build.log 2>&1 & \

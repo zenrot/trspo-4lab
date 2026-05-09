@@ -76,7 +76,7 @@ services:
       OLLAMA_HOST: http://ollama:11434
     volumes:
       - ollama-data:/root/.ollama
-    entrypoint: ["/bin/sh", "-lc", "sleep 5 && ollama pull gemma2:2b"]
+    entrypoint: ["/bin/sh", "-lc", "sleep 5 && ollama pull qwen2.5-coder:0.5b"]
 
   webserver:
     image: nginx:latest

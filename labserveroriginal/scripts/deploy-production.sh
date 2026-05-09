@@ -111,7 +111,7 @@ cat > Server/appsettings.docker.json <<JSONEOF
     "MaxLlmCandidates": 3,
     "Ollama": {
       "BaseUrl": "$OLLAMA_BASE_URL",
-      "Model": "gemma2:2b",
+      "Model": "qwen2.5-coder:0.5b",
       "TimeoutSeconds": 120
     }
   },

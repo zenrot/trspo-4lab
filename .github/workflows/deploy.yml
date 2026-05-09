@@ -30,7 +30,7 @@ jobs:
       POSTGRES_HOST_PORT: 15432
       PLAGIARISM_PORT: 15289
       MAILPIT_WEB_PORT: 18083
-      OLLAMA_MODEL: gemma2:2b
+      OLLAMA_MODEL: qwen2.5-coder:0.5b
 
     steps:
       - name: Checkout
