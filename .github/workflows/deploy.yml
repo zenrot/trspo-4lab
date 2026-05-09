@@ -106,6 +106,13 @@ jobs:
           cd "\$RELEASE_DIR/labserveroriginal"
           chmod +x scripts/deploy-production.sh
 
+          if [ -n '${{ secrets.SMTP_DOMAIN }}' ]; then export SMTP_DOMAIN='${{ secrets.SMTP_DOMAIN }}'; fi
+          if [ -n '${{ secrets.SMTP_EMAIL }}' ]; then export SMTP_EMAIL='${{ secrets.SMTP_EMAIL }}'; fi
+          if [ -n '${{ secrets.SMTP_USERNAME }}' ]; then export SMTP_USERNAME='${{ secrets.SMTP_USERNAME }}'; fi
+          if [ -n '${{ secrets.SMTP_PASSWORD }}' ]; then export SMTP_PASSWORD='${{ secrets.SMTP_PASSWORD }}'; fi
+          if [ -n '${{ secrets.SMTP_SSL }}' ]; then export SMTP_SSL='${{ secrets.SMTP_SSL }}'; fi
+          if [ -n '${{ secrets.SMTP_PORT }}' ]; then export SMTP_PORT='${{ secrets.SMTP_PORT }}'; fi
+
           PUBLIC_HOST='${{ env.PUBLIC_HOST }}' \
           ADMIN_PORT='${{ env.ADMIN_PORT }}' \
           DASHBOARD_PORT='${{ env.DASHBOARD_PORT }}' \
