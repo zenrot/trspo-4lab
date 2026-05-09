@@ -126,7 +126,11 @@ cat > Server/appsettings.docker.json <<JSONEOF
 }
 JSONEOF
 
-docker compose -p trspo-lab -f compose.deploy.yml pull ollama
+if docker image inspect "$OLLAMA_IMAGE" >/dev/null 2>&1; then
+  echo "Ollama image already exists locally: $OLLAMA_IMAGE"
+else
+  docker compose -p trspo-lab -f compose.deploy.yml pull ollama
+fi
 docker compose -p trspo-lab -f compose.deploy.yml up -d db mailpit gitlab ollama
 
 echo "Waiting for GitLab to accept rails runner commands..."

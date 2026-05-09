@@ -39,13 +39,24 @@ jobs:
       - name: Build and push Ollama image
         run: |
           set -euo pipefail
-          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/trspo-4lab-ollama:${GITHUB_SHA}"
+          MODEL_TAG="$(printf '%s' "$OLLAMA_MODEL" | tr '[:upper:]/:' '[:lower:]--')"
+          MODEL_HASH="$(
+            {
+              printf '%s\n' "$OLLAMA_MODEL"
+              sha256sum labserveroriginal/ollama/Dockerfile
+            } | sha256sum | cut -c1-12
+          )"
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/trspo-4lab-ollama:${MODEL_TAG}-${MODEL_HASH}"
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-          docker build \
-            --build-arg "OLLAMA_MODEL=${OLLAMA_MODEL}" \
-            -t "$IMAGE" \
-            labserveroriginal/ollama
-          docker push "$IMAGE"
+          if docker manifest inspect "$IMAGE" >/dev/null 2>&1; then
+            echo "Ollama image already exists: $IMAGE"
+          else
+            docker build \
+              --build-arg "OLLAMA_MODEL=${OLLAMA_MODEL}" \
+              -t "$IMAGE" \
+              labserveroriginal/ollama
+            docker push "$IMAGE"
+          fi
           echo "OLLAMA_IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - name: Prepare SSH key
