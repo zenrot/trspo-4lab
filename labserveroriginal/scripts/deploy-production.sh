@@ -12,6 +12,17 @@ POSTGRES_HOST_PORT="${POSTGRES_HOST_PORT:-15432}"
 PLAGIARISM_PORT="${PLAGIARISM_PORT:-15289}"
 MAILPIT_WEB_PORT="${MAILPIT_WEB_PORT:-18083}"
 OLLAMA_BASE_URL="${OLLAMA_BASE_URL:-http://host.docker.internal:11434}"
+SMTP_DOMAIN="${SMTP_DOMAIN:-mailpit}"
+SMTP_EMAIL="${SMTP_EMAIL:-noreply@$PUBLIC_HOST}"
+SMTP_USERNAME="${SMTP_USERNAME:-labserver}"
+SMTP_PASSWORD="${SMTP_PASSWORD:-labserver}"
+SMTP_SSL="${SMTP_SSL:-false}"
+SMTP_PORT="${SMTP_PORT:-1025}"
+
+if [ "$SMTP_SSL" != "true" ] && [ "$SMTP_SSL" != "false" ]; then
+  echo "SMTP_SSL must be either 'true' or 'false', got '$SMTP_SSL'" >&2
+  exit 1
+fi
 
 DATA_DIR="$APP_ROOT/data"
 SHARED_DIR="$APP_ROOT/shared"
@@ -53,12 +64,12 @@ POSTGRES_DB=labs
 POSTGRES_PASSWORD=$POSTGRES_PASSWORD
 JWT_SECURITY_KEY=$JWT_SECURITY_KEY
 GITLAB_TOKEN=$GITLAB_TOKEN
-SMTP_DOMAIN=mailpit
-SMTP_EMAIL=noreply@$PUBLIC_HOST
-SMTP_USERNAME=labserver
-SMTP_PASSWORD=labserver
-SMTP_SSL=false
-SMTP_PORT=1025
+SMTP_DOMAIN=$SMTP_DOMAIN
+SMTP_EMAIL=$SMTP_EMAIL
+SMTP_USERNAME=$SMTP_USERNAME
+SMTP_PASSWORD=$SMTP_PASSWORD
+SMTP_SSL=$SMTP_SSL
+SMTP_PORT=$SMTP_PORT
 DISABLE_BACKGROUND_SERVICES=false
 DATABASE_ENSURE_CREATED_ON_STARTUP=true
 OLLAMA_BASE_URL=$OLLAMA_BASE_URL
@@ -102,12 +113,12 @@ cat > Server/appsettings.docker.json <<JSONEOF
     }
   },
   "SMTP": {
-    "domain": "mailpit",
-    "email": "noreply@$PUBLIC_HOST",
-    "username": "labserver",
-    "password": "labserver",
-    "ssl": false,
-    "port": 1025
+    "domain": "$SMTP_DOMAIN",
+    "email": "$SMTP_EMAIL",
+    "username": "$SMTP_USERNAME",
+    "password": "$SMTP_PASSWORD",
+    "ssl": $SMTP_SSL,
+    "port": $SMTP_PORT
   }
 }
 JSONEOF
