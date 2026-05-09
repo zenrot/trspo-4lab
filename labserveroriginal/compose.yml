@@ -1,0 +1,144 @@
+services:
+  labserver:
+    image: labserver
+    build:
+      context: .
+      dockerfile: Server/Dockerfile
+    user: root
+    volumes:
+      - './Server/appsettings.docker.json:/app/appsettings.json:ro'
+      - '../:/plagiarism/seed:ro'
+      - 'plagiarism-learning:/plagiarism/learned'
+    depends_on:
+      - db
+      - plagiarism-server
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      DisableBackgroundServices: ${DISABLE_BACKGROUND_SERVICES:-true}
+      Plagiarism__Ollama__BaseUrl: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      Plagiarism__LearningDirectory: /plagiarism/learned
+      Plagiarism__ReferenceDirectory: /plagiarism/seed
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "512k"
+        max-file: 16
+
+  plagiarism-server:
+    image: labserver-plagiarism
+    build:
+      context: .
+      dockerfile: Server/Dockerfile
+    user: root
+    ports:
+      - "5289:5288"
+    volumes:
+      - './Server/appsettings.docker.json:/app/appsettings.json:ro'
+      - '../:/plagiarism/seed:ro'
+      - 'plagiarism-learning:/plagiarism/learned'
+    depends_on:
+      - db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      DisableBackgroundServices: "true"
+      Plagiarism__Ollama__BaseUrl: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      Plagiarism__LearningDirectory: /plagiarism/learned
+      Plagiarism__ReferenceDirectory: /plagiarism/seed
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "512k"
+        max-file: 16
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles:
+      - ollama-container
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "512k"
+        max-file: 16
+
+  ollama-init:
+    image: ollama/ollama:latest
+    profiles:
+      - ollama-container
+    depends_on:
+      - ollama
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    volumes:
+      - ollama-data:/root/.ollama
+    entrypoint: ["/bin/sh", "-lc", "sleep 5 && ollama pull gemma2:2b"]
+
+  webserver:
+    image: nginx:latest
+    depends_on:
+      - labserver
+    ports:
+      - "8080:80"
+      - "8081:8081"
+      - "8082:8082"
+    restart: always
+    volumes:
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./web/admin/dist/admin:/var/www/sites/admin:ro
+      - ./web/dashboard/dist/dashboard:/var/www/sites/dashboard:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "512k"
+        max-file: 16
+
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128m
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-15432}:5432"
+    environment:
+      POSTGRES_PASSWORD: changeit
+      POSTGRES_DB: labs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "512k"
+        max-file: 16
+
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    profiles:
+      - gitlab
+    restart: always
+    hostname: 'git.ooplabs.ru'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        # Add any other gitlab.rb configuration here, each on its own line
+        external_url 'http://git.ooplabs.ru'
+        nginx['redirect_http_to_https'] = false
+        letsencrypt['enable'] = false
+    ports:
+      - '8082:80'
+      - '8022:22'
+    volumes:
+      - '/srv/github/config:/etc/gitlab'
+      - '/srv/github/logs:/var/log/gitlab'
+      - '/srv/github/data:/var/opt/gitlab'
+    shm_size: '256m'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "512k"
+        max-file: 16
+
+volumes:
+  ollama-data:
+  plagiarism-learning:

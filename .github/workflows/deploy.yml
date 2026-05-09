@@ -1,0 +1,95 @@
+name: Deploy LabServer
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: labserver-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_USER: alexey
+      DEPLOY_HOST: 188.243.90.29
+      DEPLOY_PATH: /home/alexey/trspo-3lab
+      PUBLIC_HOST: zenrot.root.sx
+      ADMIN_PORT: 18080
+      DASHBOARD_PORT: 18081
+      GITLAB_HTTP_PORT: 18082
+      GITLAB_SSH_PORT: 18022
+      POSTGRES_HOST_PORT: 15432
+      PLAGIARISM_PORT: 15289
+      MAILPIT_WEB_PORT: 18083
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install sshpass
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: Prepare SSH known hosts
+        env:
+          SSHPASS: ${{ secrets.DEPLOY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          sshpass -e ssh -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" 'echo SSH_OK'
+
+      - name: Pack repository
+        run: |
+          set -euo pipefail
+          tar \
+            --exclude='.git' \
+            --exclude='.idea' \
+            --exclude='**/node_modules' \
+            --exclude='**/dist' \
+            --exclude='**/bin' \
+            --exclude='**/obj' \
+            --exclude='labserveroriginal/Server/appsettings.docker.json' \
+            -czf "/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz" .
+
+      - name: Upload package
+        env:
+          SSHPASS: ${{ secrets.DEPLOY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          sshpass -e scp -o StrictHostKeyChecking=yes "/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz"
+
+      - name: Deploy over SSH
+        env:
+          SSHPASS: ${{ secrets.DEPLOY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          sshpass -e ssh -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' <<REMOTE
+          set -euo pipefail
+
+          APP_ROOT='${{ env.DEPLOY_PATH }}'
+          RELEASE_DIR="\$APP_ROOT/releases/${{ github.sha }}"
+
+          mkdir -p "\$RELEASE_DIR" "\$APP_ROOT/releases"
+          tar -xzf "/tmp/trspo-3lab-${{ github.sha }}.tar.gz" -C "\$RELEASE_DIR"
+          ln -sfn "\$RELEASE_DIR" "\$APP_ROOT/current"
+
+          cd "\$RELEASE_DIR/labserveroriginal"
+          chmod +x scripts/deploy-production.sh
+
+          PUBLIC_HOST='${{ env.PUBLIC_HOST }}' \
+          ADMIN_PORT='${{ env.ADMIN_PORT }}' \
+          DASHBOARD_PORT='${{ env.DASHBOARD_PORT }}' \
+          GITLAB_HTTP_PORT='${{ env.GITLAB_HTTP_PORT }}' \
+          GITLAB_SSH_PORT='${{ env.GITLAB_SSH_PORT }}' \
+          POSTGRES_HOST_PORT='${{ env.POSTGRES_HOST_PORT }}' \
+          PLAGIARISM_PORT='${{ env.PLAGIARISM_PORT }}' \
+          MAILPIT_WEB_PORT='${{ env.MAILPIT_WEB_PORT }}' \
+          ./scripts/deploy-production.sh "\$APP_ROOT" '${{ github.sha }}'
+          REMOTE
