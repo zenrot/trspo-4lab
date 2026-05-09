@@ -50,6 +50,8 @@ jobs:
             -o IdentitiesOnly=yes \
             -i ~/.ssh/id_ed25519 \
             -o ConnectTimeout=20 \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=20 \
             "$DEPLOY_USER@$DEPLOY_HOST" 'echo SSH_OK'
 
       - name: Pack repository
@@ -75,6 +77,8 @@ jobs:
             -o IdentitiesOnly=yes \
             -i ~/.ssh/id_ed25519 \
             -o ConnectTimeout=20 \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=20 \
             "/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz"
 
       - name: Deploy over SSH
@@ -87,6 +91,8 @@ jobs:
             -o IdentitiesOnly=yes \
             -i ~/.ssh/id_ed25519 \
             -o ConnectTimeout=20 \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=20 \
             "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' <<REMOTE
           set -euo pipefail
 

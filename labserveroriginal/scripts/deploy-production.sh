@@ -117,6 +117,7 @@ docker compose -p trspo-lab -f compose.deploy.yml up -d db mailpit gitlab
 echo "Waiting for GitLab to accept rails runner commands..."
 for attempt in $(seq 1 90); do
   if docker exec trspo-gitlab gitlab-rails runner "puts 'ready'" >/dev/null 2>&1; then
+    echo "GitLab rails runner is ready after attempt $attempt."
     break
   fi
 
@@ -126,6 +127,7 @@ for attempt in $(seq 1 90); do
     exit 1
   fi
 
+  echo "GitLab is still starting, attempt $attempt/90. Waiting 10 seconds..."
   sleep 10
 done
 
