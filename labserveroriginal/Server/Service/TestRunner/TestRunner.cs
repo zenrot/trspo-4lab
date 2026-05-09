@@ -70,7 +70,12 @@ public class TestRunner : BackgroundService
                         foreach (var assignedTest in assignedTests)
                         {
                             var existingTestRun = labSubmission.TestRuns.SingleOrDefault(tr => tr.CourseLabTestMappingId == assignedTest.Id);
-                            if (existingTestRun != null && existingTestRun.State == TestRunState.Scheduled) // test was already scheduled. Check if result is ready.
+                            if (existingTestRun?.State == TestRunState.Completed)
+                            {
+                                continue;
+                            }
+
+                            if (existingTestRun?.State == TestRunState.Scheduled) // test was already scheduled. Check if result is ready.
                             {
                                 HttpResponseMessage? resp;
                                 try
