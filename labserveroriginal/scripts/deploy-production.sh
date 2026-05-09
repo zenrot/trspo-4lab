@@ -90,7 +90,7 @@ cat > Server/appsettings.docker.json <<JSONEOF
   },
   "AllowedHosts": "*",
   "GitLabClient": {
-    "url": "http://gitlab",
+    "url": "http://gitlab:$GITLAB_HTTP_PORT",
     "secret_token": "$GITLAB_TOKEN"
   },
   "Services": {
