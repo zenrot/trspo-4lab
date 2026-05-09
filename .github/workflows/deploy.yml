@@ -14,6 +14,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       DEPLOY_USER: alexey
       DEPLOY_HOST: 188.243.90.29
       DEPLOY_PATH: /home/alexey/trspo-3lab
@@ -28,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install sshpass
         run: |
@@ -41,9 +42,20 @@ jobs:
           SSHPASS: ${{ secrets.DEPLOY_PASSWORD }}
         run: |
           set -euo pipefail
+          if [ -z "${SSHPASS:-}" ]; then
+            echo "::error::GitHub secret DEPLOY_PASSWORD is empty or missing. Add it in Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
           mkdir -p ~/.ssh
-          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
-          sshpass -e ssh -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" 'echo SSH_OK'
+          ssh-keyscan -T 10 -p 22 -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          sshpass -e ssh \
+            -p 22 \
+            -o StrictHostKeyChecking=yes \
+            -o PreferredAuthentications=password,keyboard-interactive \
+            -o PubkeyAuthentication=no \
+            -o NumberOfPasswordPrompts=1 \
+            -o ConnectTimeout=20 \
+            "$DEPLOY_USER@$DEPLOY_HOST" 'echo SSH_OK'
 
       - name: Pack repository
         run: |
@@ -63,14 +75,28 @@ jobs:
           SSHPASS: ${{ secrets.DEPLOY_PASSWORD }}
         run: |
           set -euo pipefail
-          sshpass -e scp -o StrictHostKeyChecking=yes "/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz"
+          sshpass -e scp \
+            -P 22 \
+            -o StrictHostKeyChecking=yes \
+            -o PreferredAuthentications=password,keyboard-interactive \
+            -o PubkeyAuthentication=no \
+            -o NumberOfPasswordPrompts=1 \
+            -o ConnectTimeout=20 \
+            "/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:/tmp/trspo-3lab-${GITHUB_SHA}.tar.gz"
 
       - name: Deploy over SSH
         env:
           SSHPASS: ${{ secrets.DEPLOY_PASSWORD }}
         run: |
           set -euo pipefail
-          sshpass -e ssh -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' <<REMOTE
+          sshpass -e ssh \
+            -p 22 \
+            -o StrictHostKeyChecking=yes \
+            -o PreferredAuthentications=password,keyboard-interactive \
+            -o PubkeyAuthentication=no \
+            -o NumberOfPasswordPrompts=1 \
+            -o ConnectTimeout=20 \
+            "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' <<REMOTE
           set -euo pipefail
 
           APP_ROOT='${{ env.DEPLOY_PATH }}'
