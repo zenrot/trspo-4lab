@@ -11,7 +11,8 @@ GITLAB_SSH_PORT="${GITLAB_SSH_PORT:-18022}"
 POSTGRES_HOST_PORT="${POSTGRES_HOST_PORT:-15432}"
 PLAGIARISM_PORT="${PLAGIARISM_PORT:-15289}"
 MAILPIT_WEB_PORT="${MAILPIT_WEB_PORT:-18083}"
-OLLAMA_BASE_URL="${OLLAMA_BASE_URL:-http://host.docker.internal:11434}"
+OLLAMA_BASE_URL="${OLLAMA_BASE_URL:-http://ollama:11434}"
+OLLAMA_IMAGE="${OLLAMA_IMAGE:-ollama/ollama:latest}"
 
 DATA_DIR="$APP_ROOT/data"
 SHARED_DIR="$APP_ROOT/shared"
@@ -62,6 +63,7 @@ SMTP_PORT=1025
 DISABLE_BACKGROUND_SERVICES=false
 DATABASE_ENSURE_CREATED_ON_STARTUP=true
 OLLAMA_BASE_URL=$OLLAMA_BASE_URL
+OLLAMA_IMAGE=$OLLAMA_IMAGE
 ENVEOF
 
 mkdir -p Server
@@ -101,6 +103,18 @@ cat > Server/appsettings.docker.json <<JSONEOF
       "period": "00:00:15"
     }
   },
+  "Plagiarism": {
+    "ReferenceDirectory": "/plagiarism/seed",
+    "ReferenceFiles": [ "reference.c" ],
+    "LearningDirectory": "/plagiarism/learned",
+    "Threshold": 0.75,
+    "MaxLlmCandidates": 3,
+    "Ollama": {
+      "BaseUrl": "$OLLAMA_BASE_URL",
+      "Model": "gemma2:2b",
+      "TimeoutSeconds": 120
+    }
+  },
   "SMTP": {
     "domain": "mailpit",
     "email": "noreply@$PUBLIC_HOST",
@@ -112,7 +126,8 @@ cat > Server/appsettings.docker.json <<JSONEOF
 }
 JSONEOF
 
-docker compose -p trspo-lab -f compose.deploy.yml up -d db mailpit gitlab
+docker compose -p trspo-lab -f compose.deploy.yml pull ollama
+docker compose -p trspo-lab -f compose.deploy.yml up -d db mailpit gitlab ollama
 
 echo "Waiting for GitLab to accept rails runner commands..."
 for attempt in $(seq 1 90); do

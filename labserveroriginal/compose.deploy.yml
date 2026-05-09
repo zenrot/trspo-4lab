@@ -15,11 +15,10 @@ services:
     depends_on:
       - db
       - plagiarism-server
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - ollama
     environment:
       DisableBackgroundServices: ${DISABLE_BACKGROUND_SERVICES:-false}
-      Plagiarism__Ollama__BaseUrl: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      Plagiarism__Ollama__BaseUrl: ${OLLAMA_BASE_URL:-http://ollama:11434}
       Plagiarism__LearningDirectory: /plagiarism/learned
       Plagiarism__ReferenceDirectory: /plagiarism/seed
       Database__EnsureCreatedOnStartup: ${DATABASE_ENSURE_CREATED_ON_STARTUP:-true}
@@ -46,14 +45,24 @@ services:
       - 'plagiarism-learning:/plagiarism/learned'
     depends_on:
       - db
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - ollama
     environment:
       DisableBackgroundServices: "true"
-      Plagiarism__Ollama__BaseUrl: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      Plagiarism__Ollama__BaseUrl: ${OLLAMA_BASE_URL:-http://ollama:11434}
       Plagiarism__LearningDirectory: /plagiarism/learned
       Plagiarism__ReferenceDirectory: /plagiarism/seed
       Database__EnsureCreatedOnStartup: ${DATABASE_ENSURE_CREATED_ON_STARTUP:-true}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "512k"
+        max-file: 16
+
+  ollama:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    restart: unless-stopped
+    environment:
+      OLLAMA_MODELS: /usr/share/ollama/.ollama/models
     logging:
       driver: "json-file"
       options:

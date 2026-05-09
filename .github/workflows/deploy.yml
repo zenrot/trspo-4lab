@@ -10,6 +10,10 @@ concurrency:
   group: labserver-production
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,10 +30,23 @@ jobs:
       POSTGRES_HOST_PORT: 15432
       PLAGIARISM_PORT: 15289
       MAILPIT_WEB_PORT: 18083
+      OLLAMA_MODEL: gemma2:2b
 
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+
+      - name: Build and push Ollama image
+        run: |
+          set -euo pipefail
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/trspo-4lab-ollama:${GITHUB_SHA}"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker build \
+            --build-arg "OLLAMA_MODEL=${OLLAMA_MODEL}" \
+            -t "$IMAGE" \
+            labserveroriginal/ollama
+          docker push "$IMAGE"
+          echo "OLLAMA_IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - name: Prepare SSH key
         run: |
@@ -98,6 +115,7 @@ jobs:
 
           APP_ROOT='${{ env.DEPLOY_PATH }}'
           RELEASE_DIR="\$APP_ROOT/releases/${{ github.sha }}"
+          echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
           mkdir -p "\$RELEASE_DIR" "\$APP_ROOT/releases"
           tar -xzf "/tmp/trspo-3lab-${{ github.sha }}.tar.gz" -C "\$RELEASE_DIR"
@@ -114,5 +132,7 @@ jobs:
           POSTGRES_HOST_PORT='${{ env.POSTGRES_HOST_PORT }}' \
           PLAGIARISM_PORT='${{ env.PLAGIARISM_PORT }}' \
           MAILPIT_WEB_PORT='${{ env.MAILPIT_WEB_PORT }}' \
+          OLLAMA_IMAGE='$OLLAMA_IMAGE' \
+          OLLAMA_BASE_URL='http://ollama:11434' \
           ./scripts/deploy-production.sh "\$APP_ROOT" '${{ github.sha }}'
           REMOTE
