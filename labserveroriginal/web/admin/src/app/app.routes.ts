@@ -12,6 +12,7 @@ import { CourseLabsPageComponent } from './components/main/pages/courses-page/co
 import { GroupCoursesPageComponent } from './components/main/pages/groups-page/group-courses-page/group-courses-page.component';
 import { GroupCourseDetailsPageComponent } from './components/main/pages/groups-page/group-courses-page/group-course-details-page/group-course-details-page.component';
 import { StudentLabPageComponent } from './components/main/pages/student-lab-page/student-lab-page.component';
+import { CourseLabTestsPageComponent } from './components/main/pages/courses-page/course-labs-page/course-lab-tests-page/course-lab-tests-page.component';
 
 export const routes: Routes = [
     {
@@ -29,6 +30,10 @@ export const routes: Routes = [
             {
                 path: 'course/:id/labs',
                 component: CourseLabsPageComponent
+            },
+            {
+                path: 'course/:courseId/lab/:labId/tests',
+                component: CourseLabTestsPageComponent
             },
             {
                 path: 'groups',

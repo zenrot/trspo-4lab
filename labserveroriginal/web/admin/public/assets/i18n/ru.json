@@ -158,6 +158,20 @@
     "courseLabsCreateModalNamePlaceholder" : "Лабораторная 1",
     "courseLabsCreateModalSubmit" : "Создать",
 
+    "courseLabsPageTestsButton" : "Тесты",
+
+    "courseLabTestsPageHeader" : "Тесты лабораторной",
+    "courseLabTestsPageTitle" : "Привязанные тесты",
+    "courseLabTestsPageDescription" : "Список тестов, привязанных к заданию «{{ lab }}».",
+    "courseLabTestsNameColumn" : "Название теста",
+    "courseLabTestsStatusColumn" : "Статус",
+    "courseLabTestsStatusActive" : "Активен",
+    "courseLabTestsStatusInactive" : "Отключён",
+    "courseLabTestsStatusNotAssigned" : "Не привязан",
+    "courseLabTestsAssignButton" : "Привязать",
+    "courseLabTestsActivateButton" : "Включить",
+    "courseLabTestsDeactivateButton" : "Отключить",
+
 
     "groupCourseDetailsPageTitle" : "Информация по курсу",
     "groupCourseDetailsPageDescription" : "Информация о прохождение курса '{{ course }}' группой '{{ group }}'.",

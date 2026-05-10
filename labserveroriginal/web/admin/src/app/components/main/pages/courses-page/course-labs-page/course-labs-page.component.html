@@ -24,7 +24,12 @@
                         <td>
                             {{ lab.name }}
                         </td>
-                        <td></td>
+                        <td class="text-end">
+                            <a [routerLink]="['/course', courseId, 'lab', lab.id, 'tests']"
+                               class="btn btn-sm btn-outline-primary">
+                                {{ 'courseLabsPageTestsButton' | translate }}
+                            </a>
+                        </td>
                     </tr>
                     }
                 </tbody>

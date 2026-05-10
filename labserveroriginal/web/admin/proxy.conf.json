@@ -1,0 +1,13 @@
+{
+  "/api": {
+    "target": "http://zenrot.root.sx:18080",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/hub": {
+    "target": "http://zenrot.root.sx:18080",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true
+  }
+}

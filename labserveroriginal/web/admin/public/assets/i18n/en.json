@@ -158,6 +158,20 @@
     "courseLabsCreateModalNamePlaceholder" : "First assignment",
     "courseLabsCreateModalSubmit" : "Create",
 
+    "courseLabsPageTestsButton" : "Tests",
+
+    "courseLabTestsPageHeader" : "Lab Tests",
+    "courseLabTestsPageTitle" : "Assigned tests",
+    "courseLabTestsPageDescription" : "Tests assigned to assignment «{{ lab }}».",
+    "courseLabTestsNameColumn" : "Test name",
+    "courseLabTestsStatusColumn" : "Status",
+    "courseLabTestsStatusActive" : "Active",
+    "courseLabTestsStatusInactive" : "Inactive",
+    "courseLabTestsStatusNotAssigned" : "Not assigned",
+    "courseLabTestsAssignButton" : "Assign",
+    "courseLabTestsActivateButton" : "Activate",
+    "courseLabTestsDeactivateButton" : "Deactivate",
+
 
     "groupCourseDetailsPageTitle" : "Course details",
     "groupCourseDetailsPageDescription" : "Infomration about '{{ course }}' course progress for group {{ group }}",
