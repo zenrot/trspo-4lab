@@ -156,6 +156,9 @@
     "courseLabsCreateModalTitle" : "Create assignment",
     "courseLabsCreateModalName" : "Name",
     "courseLabsCreateModalNamePlaceholder" : "First assignment",
+    "courseLabsCreateModalGitLabName" : "GitLab name",
+    "courseLabsCreateModalGitLabNamePlaceholder" : "lab1",
+    "courseLabsCreateModalGitLabNameHint" : "Latin letters, digits and hyphens only. Used as GitLab path.",
     "courseLabsCreateModalSubmit" : "Create",
 
     "courseLabsPageTestsButton" : "Tests",

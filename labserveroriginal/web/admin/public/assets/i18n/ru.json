@@ -156,6 +156,9 @@
     "courseLabsCreateModalTitle" : "Создать задание",
     "courseLabsCreateModalName" : "Название",
     "courseLabsCreateModalNamePlaceholder" : "Лабораторная 1",
+    "courseLabsCreateModalGitLabName" : "GitLab имя",
+    "courseLabsCreateModalGitLabNamePlaceholder" : "lab1",
+    "courseLabsCreateModalGitLabNameHint" : "Только латиница, цифры и дефис. Используется как путь в GitLab.",
     "courseLabsCreateModalSubmit" : "Создать",
 
     "courseLabsPageTestsButton" : "Тесты",

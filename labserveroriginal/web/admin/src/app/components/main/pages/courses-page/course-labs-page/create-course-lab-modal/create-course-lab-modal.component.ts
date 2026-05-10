@@ -23,19 +23,20 @@ export class CreateCourseLabModalComponent {
     private notificationService: PopupNotificationsService) {
 
     this.createCourseLabForm = fb.group({
-      'labname': ['']
+      'labname': [''],
+      'gitlabname': ['']
     });
   }
 
   protected async createCourseLab() {
     const val = this.createCourseLabForm.value;
     if (this.courseId) {
-      if (val.labname) {
+      if (val.labname && val.gitlabname) {
         await this.labsService.createLab(this.courseId, {
           id: undefined,
           name: val.labname,
           courseId: undefined,
-          gitLabName: undefined,
+          gitLabName: val.gitlabname,
 
           course: undefined
         });
