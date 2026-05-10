@@ -65,7 +65,6 @@ public class OllamaGemmaAnalyzer : ILlmCodeSimilarityAnalyzer
         You are a code plagiarism analyzer. Compare two C/C++/C# code fragments.
         Return only JSON in this exact format: {"similarity":0.0,"explanation":"short reason"}.
         similarity must be between 0 and 1.
-        Token shingle similarity is {{tokenSimilarity:F3}}.
 
         Code A:
         ```c

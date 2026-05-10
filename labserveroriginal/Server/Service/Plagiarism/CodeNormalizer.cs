@@ -37,7 +37,7 @@ public class CodeNormalizer
 
             if (IsIdentifier(token) && !s_keywords.Contains(token))
             {
-                result.Add("ID");
+                result.Add(token.ToLowerInvariant());
                 continue;
             }
 
