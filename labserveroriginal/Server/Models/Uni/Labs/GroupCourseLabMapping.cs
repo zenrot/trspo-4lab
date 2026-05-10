@@ -70,6 +70,17 @@ public class GroupCourseLabMapping : GitLabIntegratedModel, IRestricted, IDataMo
         return await GitLab.GetOne<GitLabGroup>(GitLabGroupId.Value);
     }
 
+    public async Task DeleteFromGitLab()
+    {
+        foreach (var studentLab in LabsForStudents)
+        {
+            if (studentLab.GitLabProjectId != null)
+                await GitLab.DeleteProject(studentLab.GitLabProjectId.Value);
+        }
+        if (GitLabGroupId != null)
+            await GitLab.DeleteGroup(GitLabGroupId.Value);
+    }
+
     public GroupCourseLabData ToData(DataConversionOption conversionOption = DataConversionOption.Default) => conversionOption switch
     {
         DataConversionOption.Default => new GroupCourseLabData

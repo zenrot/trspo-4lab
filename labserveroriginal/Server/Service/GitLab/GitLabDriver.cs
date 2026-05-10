@@ -48,4 +48,10 @@ public class GitLabDriver : IGitLab
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList() ?? new List<System.String>();
     }
+
+    public async Task<System.Boolean> DeleteProject(System.Int64 projectId)
+        => await _client.Delete($"/projects/{projectId}");
+
+    public async Task<System.Boolean> DeleteGroup(System.Int64 groupId)
+        => await _client.Delete($"/groups/{groupId}");
 }

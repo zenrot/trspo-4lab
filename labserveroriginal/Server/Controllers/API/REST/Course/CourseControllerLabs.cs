@@ -100,4 +100,21 @@ public partial class CoursesController : BaseRestController<CourseModel, CourseD
 
         return ApiRequestResult.Success<CourseLabData>(courseLab.ToData());
     }
+
+    [HttpDelete("{courseId}/labs/{courseLabId}")]
+    public async Task<ApiRequestResult> DeleteCourseLab(System.Int64 courseId, System.Int64 courseLabId)
+    {
+        var courseLabResult = await _getOneCourseLab(courseId, courseLabId);
+        if (courseLabResult.Item1 != RestEntityStatus.Ready)
+            return _returnBadResult(courseLabResult.Item1);
+        var courseLab = courseLabResult.Item2 ?? throw new NotImplementedException("sanity check");
+
+        foreach (var groupCourseLab in courseLab.AssignedGroups.ToList())
+            await groupCourseLab.DeleteFromGitLab();
+
+        _labsContext.CourseLabs.Remove(courseLab);
+        await _labsContext.SaveChangesAsync();
+
+        return ApiRequestResult.Success();
+    }
 }

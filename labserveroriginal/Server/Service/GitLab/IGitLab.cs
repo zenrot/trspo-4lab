@@ -17,4 +17,6 @@ public interface IGitLab
     Task<List<GitLabMergeRequest>> GetMergeRequests();
     Task<System.Byte[]?> GetRepositoryArchive(System.Int64 projectId, System.String commitHash);
     Task<IReadOnlyList<System.String>> GetMergeRequestChangedPaths(System.Int64 projectId, System.Int64 mergeRequestIid);
+    Task<System.Boolean> DeleteProject(System.Int64 projectId);
+    Task<System.Boolean> DeleteGroup(System.Int64 groupId);
 }

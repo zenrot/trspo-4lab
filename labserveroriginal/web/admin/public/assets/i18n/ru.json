@@ -162,6 +162,7 @@
     "courseLabsCreateModalSubmit" : "Создать",
 
     "courseLabsPageTestsButton" : "Тесты",
+    "courseLabsPageDeleteButton" : "Удалить",
 
     "courseLabTestsPageHeader" : "Тесты лабораторной",
     "courseLabTestsPageTitle" : "Привязанные тесты",

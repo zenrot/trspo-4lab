@@ -11,7 +11,11 @@ using LabServer.Shared.Models.Uni;
 
 public partial class CoursesController : BaseRestController<CourseModel, CourseData>
 {
-    public CoursesController(IDBStorage<CourseModel> storage, UserManager<UserModel> userManager, IHubContext<DataHub> dataHub) : base(storage, userManager, dataHub)
+    private readonly LabServer.Server.Data.LabsContext _labsContext;
+
+    public CoursesController(IDBStorage<CourseModel> storage, UserManager<UserModel> userManager, IHubContext<DataHub> dataHub,
+        LabServer.Server.Data.LabsContext labsContext) : base(storage, userManager, dataHub)
     {
+        _labsContext = labsContext;
     }
 }

@@ -23,4 +23,8 @@ export class CourseLabsService extends ApiServiceBase {
   public async createLab(courseId: number, lab: ICourseLab): Promise<ICourseLab> {
     return await this.apiPost<ICourseLab>(this.makeEndpoint(courseId, ""), lab);
   }
+
+  public async deleteLab(courseId: number, labId: number): Promise<boolean> {
+    return await this.apiDelete<boolean>(this.makeEndpoint(courseId, `/${labId}`));
+  }
 }

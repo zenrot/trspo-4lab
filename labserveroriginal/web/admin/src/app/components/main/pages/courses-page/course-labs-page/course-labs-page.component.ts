@@ -55,6 +55,16 @@ export class CourseLabsPageComponent implements OnInit, OnDestroy {
     this.courseLabUpdateSubscription?.unsubscribe();
   }
 
+  protected async deleteLab(lab: ICourseLab) {
+    if (!this.courseId || lab.id === undefined) return;
+    const confirmed = window.confirm(`Удалить лабу "${lab.name}"? Все репозитории GitLab будут удалены безвозвратно.`);
+    if (!confirmed) return;
+    const result = await this.labsService.deleteLab(this.courseId, lab.id);
+    if (result !== null) {
+      this.labs.setElems(await this.labsService.getAll(this.courseId));
+    }
+  }
+
   protected openCreateLabModal() {
     if (this.course) {
       const initialState: ModalOptions = {

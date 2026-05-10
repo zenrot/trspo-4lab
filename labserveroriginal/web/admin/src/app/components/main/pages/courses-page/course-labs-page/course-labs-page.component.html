@@ -26,9 +26,13 @@
                         </td>
                         <td class="text-end">
                             <a [routerLink]="['/course', courseId, 'lab', lab.id, 'tests']"
-                               class="btn btn-sm btn-outline-primary">
+                               class="btn btn-sm btn-outline-primary me-1">
                                 {{ 'courseLabsPageTestsButton' | translate }}
                             </a>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    (click)="deleteLab(lab)">
+                                {{ 'courseLabsPageDeleteButton' | translate }}
+                            </button>
                         </td>
                     </tr>
                     }

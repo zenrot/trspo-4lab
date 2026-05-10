@@ -162,6 +162,7 @@
     "courseLabsCreateModalSubmit" : "Create",
 
     "courseLabsPageTestsButton" : "Tests",
+    "courseLabsPageDeleteButton" : "Delete",
 
     "courseLabTestsPageHeader" : "Lab Tests",
     "courseLabTestsPageTitle" : "Assigned tests",

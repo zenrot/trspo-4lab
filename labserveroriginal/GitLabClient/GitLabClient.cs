@@ -129,4 +129,18 @@ public class GitLabClient
             ? await resp.Content.ReadFromJsonAsync<T>()
             : default;
     }
+
+    public async Task<System.Boolean> Delete(System.String endpoint)
+    {
+        var uri = $"{_apiBase}{endpoint}?private_token={_authToken}";
+        try
+        {
+            var resp = await _httpClient.DeleteAsync(uri);
+            return resp.StatusCode == HttpStatusCode.NoContent || resp.StatusCode == HttpStatusCode.Accepted || resp.StatusCode == HttpStatusCode.OK;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }
